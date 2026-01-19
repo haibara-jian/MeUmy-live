@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.png" type="image/x-icon" />
+    <link href="css/bootstrap.min.css" rel="stylesheet" >
+    <script src="js/echarts.min.js" ></script>
+    <script src="js/fuse.min.js" ></script>
+    <script src="js/vue.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <title>MeUmy草原自动路灯</title>
+    <style>[v-cloak] {display: none;}</style>
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+          <img src="/pic/icon.svg" alt=""height="32">
+          MeUmy草原自动路灯
+        </span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown">呜米</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="https://live.bilibili.com/22384516" target="_blank">直播间</a></li>
+                <li><a class="dropdown-item" href="https://space.bilibili.com/617459493" target="_blank">个人主页</a></li>
+                <li><a class="dropdown-item" href="https://weibo.com/u/7079069131" target="_blank">微博 @呜米嗷呜</a></li>
+                <li><a class="dropdown-item" href="https://mht.meumy.club/" target="_blank">提问箱 @MeUmy的棉花糖</a></li>
+                <li><a class="dropdown-item" href="https://music.163.com/#/user/home?id=1306304320" target="_blank">网易云 @呜米嗷嗷嗷</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown">咩栗</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="https://live.bilibili.com/8792912" target="_blank">直播间</a></li>
+                <li><a class="dropdown-item" href="https://space.bilibili.com/745493" target="_blank">个人主页</a></li>
+                <li><a class="dropdown-item" href="https://weibo.com/u/7080286241" target="_blank">微博 @电击咩阿栗</a></li>
+                <li><a class="dropdown-item" href="https://mht.meumy.club/" target="_blank">提问箱 @MeUmy的棉花糖</a></li>
+                <li><a class="dropdown-item" href="https://music.163.com/#/user/home?id=1356709812" target="_blank">网易云 @咩栗咩咩咩</a></li>
+              </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="https://space.bilibili.com/674421433" target="_blank">呜米咩栗的草原组</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://space.bilibili.com/674622242" target="_blank">MeUmy官方录播组</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://meumy.club/" target="_blank">MeUmy草原平行时空</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container" id="app" v-cloak>
+      <div class="p-4 p-md-5 mb-4 rounded-bottom bg-white row">
+        <div class="col-lg-8 px-0">
+          <h1 class="display-4 font-italic">自动路灯来辣！</h1>
+          <p class="lead my-3">分析直播弹幕，统计热点词语，方便没时间看直播的单推人和切片man~</p>
+          <div class="row g-1 mb-3">
+            <div class="col-auto col-form-label fw-bold">选择时间：</div>
+            <div class="col-auto">
+              <select class="form-select" v-model="vup_id" id="vup_list">
+                <option selected value="22384516">呜米</option>
+                <option value="8792912">咩栗</option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <select class="form-select" v-model="date_n" id="date_list">
+                <option selected :value="item.val" v-for="item in date_list">{{item.str}}</option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <a class="btn btn-outline-primary" href="https://space.bilibili.com/674622242/" target="_blank" id="jump_to_recording">打开录播合集</a>
+            </div>
+            <div class="col-auto">
+              <div class="spinner-border" role="status" id="loading_icon">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 px-0" id="umy_profile" v-if="vup_id==22384516">
+          <div class="row">
+            <div class="col-5 text-end">
+              <img src="/pic/umy_profile.jpg" class="img-fluid img-thumbnail" alt="Umy profile">
+            </div>
+            <div class="col-7 d-flex flex-column">
+              <h5>呜米</h5>
+              一起留下这个夏天属于我们的回忆吧
+              <div class="pt-auto align-self-end mt-auto">
+                <div class="btn-group" role="group">
+                  <a class="btn btn-outline-primary" href="https://space.bilibili.com/617459493" target="_blank">主页</a>
+                  <a class="btn btn-outline-primary" href="https://live.bilibili.com/22384516" target="_blank">直播间</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 px-0" id="merry_profile" v-if="vup_id==8792912">
+          <div class="row">
+            <div class="col-5 text-end">
+              <img src="/pic/merry_profile.jpg" class="img-fluid img-thumbnail" alt="Merry profile">
+            </div>
+            <div class="col-7 d-flex flex-column">
+              <h5>咩栗</h5>
+              电击小羊，羊名立万✨ ❖微博:电击咩阿栗❖
+              <div class="pt-auto align-self-end mt-auto">
+                <div class="btn-group" role="group">
+                  <a class="btn btn-outline-primary" href="https://space.bilibili.com/745493" target="_blank">主页</a>
+                  <a class="btn btn-outline-primary" href="https://live.bilibili.com/8792912" target="_blank">直播间</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-body p-4 text-center mb-0 container">
+        <h4 class="pb-2">{{words_title}}</h4>
+        <div id="main_word1"><span class="fs-3">{{all_hot_words.all[1]}}</span><span class="fs-1 fw-bold px-4">{{all_hot_words.all[0]}}</span><span class="fs-5">{{all_hot_words.all[2]}}</span></div> 
+        <div id="main_word2" class="text-secondary"><span class="px-2">{{all_hot_words.all[3]}}</span><span class="px-2">{{all_hot_words.all[4]}}</span><span class="px-2">{{all_hot_words.all[5]}}</span><span class="px-2">{{all_hot_words.all[6]}}</span><span class="px-2">{{all_hot_words.all[7]}}</span><span class="px-2">{{all_hot_words.all[8]}}</span><span class="px-2">{{all_hot_words.all[9]}}</span></div>
+      </div>
+      <div class="form-check form-switch text-start mt-2 mb-4 text-secondary">
+        <input class="form-check-input" type="checkbox" v-model="show_key_words" id="show_key_words">
+        <label class="form-check-label" for="show_key_words">显示直播弹幕关键词(Beta)</label>
+      </div>
+      <div id="main_chart" class="container" style="height:420px;"></div>
+      <div class="card card-body  p-4 my-4 container">
+        <h4>图表属性</h4>
+        <div class="row gx-3 gy-3 align-items-center">
+          <div class="col-md-6">
+            <form class="row align-items-center" id="live_start_time_form" novalidate>
+              <div class="col-auto">直播开始时间:</div>
+              <div class="col-auto">
+                <input type="text" class="form-control has-vaildation" id="live_start_time" placeholder="直播开始时间" required>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <input class="form-check-input" type="checkbox" v-model="use_live_time" id="use_live_time">
+            <label class="form-check-label" for="use_live_time">使用直播时间作为横坐标</label>
+          </div>
+          <div class="col-md-6">
+            <input class="form-check-input" type="checkbox" v-model="show_superchat" id="show_superchat">
+            <label class="form-check-label" for="show_superchat">在图中显示醒目留言</label>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <input class="form-check-input" type="radio" value="all" name="show_density" v-model="show_density" id="show_all_density">
+              <label class="form-check-label" for="show_all_density">显示全部</label>
+            </div>
+            <div>
+              <input class="form-check-input" type="radio" value="call" name="show_density" v-model="show_density" id="show_keywords_density">
+              <label class="form-check-label" for="show_keywords_density">仅显示打call密度(定位歌)</label>
+            </div>
+            <div>
+              <input class="form-check-input" type="radio" value="haha" name="show_density" v-model="show_density" id="show_haha_density">
+              <label class="form-check-label" for="show_haha_density">仅显示哈密度</label>
+            </div>
+            <div>
+              <input class="form-check-input" type="radio" value="fuck" name="show_density" v-model="show_density" id="show_fuck_density">
+              <label class="form-check-label" for="show_fuck_density">仅显示草密度</label>
+            </div>
+            <div>
+              <input class="form-check-input" type="radio" value="problem" name="show_density" v-model="show_density" id="show_problem_density">
+              <label class="form-check-label" for="show_problem_density">仅显示？密度</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#peak_list_container">
+              显示弹幕峰值列表
+            </button>
+          </div>
+        </div>
+        <div class="collapse" id="peak_list_container">
+          <div class="card card-body mt-3 p-0">
+            <ul class="list-group list-group-flush" id="peak_list">
+              <li class="list-group-item" v-for="peak in peaks"><div class="row g-2"><div class="col-auto text-secondary" style="width:5rem">{{peak.time}}</div><div class="col-auto">{{peak.words}}</div></div></li>
+            </ul>
+          </div>
+        </div>
+        <h4 class="pt-4">醒目留言</h4>
+        <div class="row gx-3 gy-3 align-items-center">
+          <div class="col-md-6">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#superchat_container">
+              展开醒目留言列表
+            </button>
+          </div>
+        </div>
+        <div class="collapse" id="superchat_container">
+          <div class="card card-body mt-3 p-0">
+            <ul class="list-group list-group-flush" id="superchat">
+              <li class="list-group-item" v-for="sc in superchat_list"><div class="row g-2"><div class="col-auto text-secondary" style="width:5rem">{{sc.time}}</div><div class="col-auto text-secondary" style="width:4rem">￥{{sc.price}}</div><div class="col-auto text-secondary">{{sc.name}}:</div><div class="col-auto">{{sc.content}}</div></div></li>
+            </ul>
+          </div>
+        </div>
+        <h4 class="pt-4">热词搜索</h4>
+        <div class="row gx-3 gy-3 align-items-center">
+          <div class="col-auto">
+            <input type="text" class="form-control" v-model="search_query" id="query_text" placeholder="搜索..." required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" id="search_button">搜索</button>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-outline-primary" type="button" id="toggle_search_result">
+              显示/隐藏搜索结果
+            </button>
+          </div>
+        </div>
+        <div class="collapse" id="search_result_container">
+          <div class="card card-body mt-3 p-0" id="search_result_container">
+            <ul class="list-group list-group-flush" id="search_result">
+              <li class="list-group-item text-secondary fst-italic" v-if="search_results.length==0">无搜索结果.</li>
+              <li class="list-group-item" v-for="r in search_results"><div class="row g-2"><div class="col-auto text-secondary" style="width:5rem">{{r.time}}</div><div class="col-auto">{{r.words}}</div></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card card-body  p-4 my-4 container text-secondary">
+        使用小提示：<br />
+        鼠标滚轮（或双指缩放）调整时间轴比例，悬停（或点击）显示弹幕热词与醒目留言。<br />
+        醒目留言小圆点可能会重叠，把时间轴放大再看会比较好！<br />
+        由于数据统计不及时，默认直播开始时间可能稍稍滞后。可根据录播手动设定直播开始时间进行校准，方便找录播。<br />
+        对于录播分片的情况，可把直播开始时间设为对应分片的开始时间，使时间轴统一。<br />
+        直播弹幕关键词(Beta)功能基于2023年10月前全部直播弹幕数据对当天弹幕关键词进行分析，仅供参考。
+      </div>
+      <div class="card card-body mt-4 text-center">
+        <h5>🌟揉爪爪夸夸榜🌟</h5>
+        <h6>发弹幕最多的是——</h5>
+        <div class="row align-items-center mt-3">
+          <div class="col-md-4" id="interact_top1">
+            <p class="fs-2 my-0 mt-2">👑</p>
+            <p class="fs-1 fw-bold my-0">{{most_interact[0][0]}}</p>
+            <div>{{most_interact[0][1]}}</div>
+          </div>
+          <div class="col-md-4 order-md-first" id="interact_top2">
+            <p class="fs-3 my-0 mt-2">{{most_interact[1][0]}}</p>
+            <div>{{most_interact[1][1]}}</div>
+          </div>
+          <div class="col-md-4" id="interact_top3">
+            <p class="fs-5 mb-0 mt-2">{{most_interact[2][0]}}</p>
+            <div>{{most_interact[2][1]}}</div>
+          </div>
+        </div>
+        <div class="fs-6 text-secondary mt-4" id="interact_top10"><span class="px-2">{{most_interact[3][0]}}</span><span class="px-2">{{most_interact[4][0]}}</span><span class="px-2">{{most_interact[5][0]}}</span><span class="px-2">{{most_interact[6][0]}}</span><span class="px-2">{{most_interact[7][0]}}</span><span class="px-2">{{most_interact[8][0]}}</span><span class="px-2">{{most_interact[9][0]}}</span></div>
+      </div>
+      <div class="card card-body p-4 text-center my-4 container">
+        <h5>都给我关注<a href="https://space.bilibili.com/617459493" target="_blank">呜米</a>和<a href="https://space.bilibili.com/745493" target="_blank">咩栗</a>啊啊啊——</h5>
+      </div>
+      <div class="card card-body p-4 text-center my-4 container"><div class="row gy-5">
+        <div class="col-md-6">
+          <h5 class="pb-1">当天单推人最爱发的词</h5>
+          <div id="gachi_word">
+            <p class="fs-2 fw-bold mb-0">{{all_hot_words.gachi[0]}}</p>
+            <p class="fs-4 mb-0">{{all_hot_words.gachi[1]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.gachi[2]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.gachi[3]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.gachi[4]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.gachi[5]}}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h5 class="pb-1">当天舰长最爱发的词</h5>
+          <div id="captain_word">
+            <p class="fs-2 fw-bold mb-0">{{all_hot_words.captain[0]}}</p>
+            <p class="fs-4 mb-0">{{all_hot_words.captain[1]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.captain[2]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.captain[3]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.captain[4]}}</p>
+            <p class="fs-6 text-secondary mb-0">{{all_hot_words.captain[5]}}</p>
+          </div>
+        </div>
+      </div></div>
+      <div class="p-4 mb-4 container">
+        <div class="collapse mb-4" id="useless_data">
+          <div class="card card-body mt-4">
+            <div class="row text-center gy-5">
+              <div class="col-md-4">
+                <h5>总弹幕数</h5>
+                <p class="fs-2 fw-bold mb-0" id="all_danmu">{{danmu_count.all}}</p>
+              </div>
+              <div class="col-md-4">
+                <h5>单推人弹幕数</h5>
+                <p class="fs-2 fw-bold mb-0" id="gachi_danmu">{{danmu_count.gachi}}</p>
+              </div>
+              <div class="col-md-4">
+                <h5>舰长弹幕数</h5>
+                <p class="fs-2 fw-bold mb-0" id="captain_danmu">{{danmu_count.captain}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-body mt-4">
+            <div class="row text-center gy-5">
+              <div class="col-md-4">
+                <h5>互动观众数</h5>
+                <p class="fs-2 fw-bold mb-0" id="all_interact">{{interact_count.all}}</p>
+              </div>
+              <div class="col-md-4">
+                <h5>互动单推人数</h5>
+                <p class="fs-2 fw-bold mb-0" id="gachi_interact">{{interact_count.gachi}}</p>
+              </div>
+              <div class="col-md-4">
+                <h5>互动舰长数</h5>
+                <p class="fs-2 fw-bold mb-0" id="captain_interact">{{interact_count.captain}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <a class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#useless_data" role="button">扩展数据</a>
+        <span class="fs-6 text-secondary mx-sm-4">没啥事的人别看</span>
+      </div>
+      <!-- 不复存在的草原组
+      <div class="card card-body p-4 text-center mb-4 container">
+        <p class="mb-0">欢迎有能man加入呜米和咩栗的后援组：</p>
+        <p class="mb-0"><a href="https://space.bilibili.com/674421433" target="_blank">呜米咩栗的草原组</a></p>
+        <p class="mb-0">具体要求请看<a href="https://t.bilibili.com/452538400215603810" target="_blank">这里</a>~</p>
+        <p class="mb-0">请加审核群：295744056！</p>
+      </div>
+      -->
+      <!-- 不复存在的小天使
+      <div class="card card-body p-4 text-center mb-4 container">
+        <p class="mb-0">感谢辛勤的官方录播man <a class="fw-bold" href="https://space.bilibili.com/4164913" target="_blank">樱木_AoUs</a> 在</p>
+        <p class="mb-0">磨刀暴鲨发18+的群友</p>
+        <p class="mb-0">和 直播间抢着刀片哥</p>
+        <p class="mb-0">的同时 没日没夜的录制上传每日直播录像！</p>
+        <p class="mb-0">录播请认准这里→<a href="https://space.bilibili.com/674622242" target="_blank">MeUmy录播组</a> 其他人的录播都是妖艳贱货。</p>
+      </div>
+      -->
+      <div class="card card-body p-4 text-center mb-4 container">
+        <p class="mb-0">2022年1月9日以前呜米的录播和2022年2月25日以前咩栗的录播在这里→<a href="https://space.bilibili.com/674622242" target="_blank">MeUmy录播组</a></p>
+        <p class="mb-0">呜米现在的录播在这里→<a href="https://space.bilibili.com/617459493/channel/seriesdetail?sid=379199&ctype=0" target="_blank">呜米的直播回放</a></p>
+        <p class="mb-0">咩栗现在的录播在这里→<a href="https://space.bilibili.com/745493/channel/seriesdetail?sid=2060035" target="_blank">咩栗的直播回放</a></p>
+        <p class="mb-0">其他人的录播都是妖艳贱货。</p>
+      </div>
+      <div class="card card-body bg-light p-4 my-4 container text-secondary">
+        <p>注：单推人指的是在呜米直播间挂【小米星】或在咩栗直播间挂【小綿花】牌子的观众</p>
+	<p>这个界面是<a href="https://lamp.meumy.club/" target="_blank">MeUmy草原自动路灯</a>的镜像站</p>
+	<p>现在由<a href="https://space.bilibili.com/6175388" target="_blank">灰原键</a>维护</p>
+        <p>本项目已开源，<a href="https://github.com/haibara-jian/meumy-live-showcase" target="_blank">Github页面</a>。欢迎Star, Fork!</p>
+        <p>原项目作者<a href="https://space.bilibili.com/1818479062" target="_blank">呜米小姐的吃饭小虎牙</a></p>
+        <p>原项目已开源，<a href="https://github.com/K-bai/meumy-live-showcase" target="_blank">Github页面</a>。欢迎Star, Fork!</p>
+        <p class="mb-0">本站部分统计灵感及2021年2月10日以前数据来自<a href="https://matsuri.icu/" target="_blank">matsuri.icu</a>。</p>
+      </div>
+    </div>
+    <script src="js/bootstrap.bundle.min.js" ></script>
+    <script src="js/main_202212011635.js"></script>
+  </body>
+</html>
